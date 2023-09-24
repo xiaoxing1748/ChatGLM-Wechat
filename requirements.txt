@@ -1,0 +1,11 @@
+transformers==4.30.2
+torch>=2.0
+gradio
+faiss-cpu
+torchvision
+langchain
+sentence_transformers
+nltk
+beautifulsoup4
+wechatpy
+flask
