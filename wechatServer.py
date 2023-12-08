@@ -13,6 +13,7 @@ from wechatpy import WeChatClient
 import time
 from threading import Thread
 import yaml
+# import chatTest
 
 app = Flask(__name__)
 app.debug = True
@@ -42,6 +43,7 @@ def asyncTask(source, content):
     print("提问:source:{}, content:{}".format(source, content))
     # response, history = model.chat(tokenizer, content, history=[])
     response = "已收到信息"
+    # response = chatTest.chat(content)
     print("回答:reply:{}".format(response))
     # time.sleep(10)
     client.message.send_text(source, response)
