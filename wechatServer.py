@@ -12,14 +12,22 @@ from wechatpy import WeChatClient
 # from transformers import AutoTokenizer, AutoModel
 import time
 from threading import Thread
+import yaml
 
 app = Flask(__name__)
 app.debug = True
 print("启动于:", datetime.datetime.now())
 
+# 读取配置文件
+with open('config.yaml', 'r') as file:
+    config_data = yaml.load(file, Loader=yaml.FullLoader)
 # 公众号信息
-client = WeChatClient('appid', 'appsecret')
-wechatToken = "xiaoxingchat"
+wechat_config = config_data.get('wechat_config', {})
+url = config_data.get('url')
+APP_ID = wechat_config.get('appid')
+APP_SECRET = wechat_config.get('appsecret')
+WECHAT_TOKEN = wechat_config.get('token')
+client = WeChatClient(APP_ID, APP_SECRET)
 
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
@@ -35,7 +43,6 @@ def asyncTask(source, content):
     # response, history = model.chat(tokenizer, content, history=[])
     response = "已收到信息"
     print("回答:reply:{}".format(response))
-    # sleep 10s
     # time.sleep(10)
     client.message.send_text(source, response)
 
@@ -51,7 +58,7 @@ def reply_msg(msg):
     return reply.render()
 
 
-@app.route('/wechat', methods=['GET', 'POST'])
+@app.route(url, methods=['GET', 'POST'])
 def wechat():
     # 服务器配置验证
     timestamp = request.args.get("timestamp")
@@ -64,7 +71,7 @@ def wechat():
             print("request timestamp:{},nonce:{}, echostr:{}, signature:{}".format(timestamp,
                                                                                    nonce, echostr, signature))
             try:
-                check_signature(wechatToken, signature, timestamp, nonce)
+                check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
                 return echostr
             except InvalidSignatureException:
                 print("invalid message from request")

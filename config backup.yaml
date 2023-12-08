@@ -1,0 +1,6 @@
+wechat_config:
+  appid: myid
+  appsecret: mysecret
+  token: mytoken
+
+url: /
