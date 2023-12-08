@@ -1,5 +1,8 @@
 #自定义
-/model/
+/model/*.bin
+/model/*.model
+/model/*.json
+/backup
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

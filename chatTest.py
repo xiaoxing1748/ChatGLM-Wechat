@@ -8,14 +8,13 @@ import sentence_transformers
 
 # 启动模型
 tokenizer = AutoTokenizer.from_pretrained(
-    r"F:\ChatGLM2-6B\model", trust_remote_code=True)
+    r"F:\ChatGLM\model", trust_remote_code=True)
 model = AutoModel.from_pretrained(
-    r"F:\ChatGLM2-6B\model", trust_remote_code=True).cuda()
-chatglm = model.eval()
-
+    r"F:\ChatGLM\model", trust_remote_code=True).cuda()
+model = model.eval()
 
 # 自定义路径
-filepath = "./docs/news.txt"
+filepath = "./document/news.txt"
 
 # 加载数据
 loader = UnstructuredFileLoader(filepath)
@@ -35,14 +34,14 @@ embeddings.client = sentence_transformers.SentenceTransformer(
 vector_store = FAISS.from_documents(docs, embeddings)
 
 # 根据提问匹配上下文
-query = "总结一下本游戏攻略的内容"
+query = "本次对话总共产生了多少tokens？以及为什么是这么多，你如何统计出来的？"
 docs = vector_store.similarity_search(query)
 context = [doc.page_content for doc in docs]
 
 # 构造Prompt
-prompt = f"已知信息:\n{context}\n根据已知信息,用简短的话回答问题:\n{query}"
+prompt = f"已知信息:\n{context}\n根据已知信息,回答问题:\n{query}"
 print(format(prompt))
 
 # 生成回答
-response, history = chatglm.chat(tokenizer, prompt, history=[])
+response, history = model.chat(tokenizer, prompt, history=[])
 print("回答:",response)

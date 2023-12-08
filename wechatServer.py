@@ -9,51 +9,55 @@ from wechatpy import parse_message
 from wechatpy.replies import create_reply
 from wechatpy.replies import TextReply
 from wechatpy import WeChatClient
-from transformers import AutoTokenizer, AutoModel
+# from transformers import AutoTokenizer, AutoModel
+import time
 from threading import Thread
 
 app = Flask(__name__)
 app.debug = True
+print("启动于:", datetime.datetime.now())
 
 # 公众号信息
-client = WeChatClient('公众号appid', '公众号secret')
+client = WeChatClient('appid', 'appsecret')
 wechatToken = "xiaoxingchat"
 
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
 
 # tokenizer = AutoTokenizer.from_pretrained(
-#     r"F:\ChatGLM2-6B\model", trust_remote_code=True)
+#     r"F:\ChatGLM\model", trust_remote_code=True)
 # model = AutoModel.from_pretrained(
-#     r"F:\ChatGLM2-6B\model", trust_remote_code=True).cuda()
+#     r"F:\ChatGLM\model", trust_remote_code=True).cuda()
 
 
-def asyncTask(userId, content):
-    print("当前时间:", datetime.datetime.now())
-    print("提问:userId:{}, content:{}".format(userId, content))
+def asyncTask(source, content):
+    print("提问:source:{}, content:{}".format(source, content))
     # response, history = model.chat(tokenizer, content, history=[])
     response = "已收到信息"
-    print("当前时间:", datetime.datetime.now())
-    print("回答:chat-GLM replay:{}".format(response))
-    # client.message.send_text(userId, response)
-    reply = create_reply(response, content)
-    return reply.render()
+    print("回答:reply:{}".format(response))
+    # sleep 10s
+    # time.sleep(10)
+    client.message.send_text(source, response)
 
 
+# 简易的回复测试
 def reply_msg(msg):
+    print("提问:source:{}, content:{}".format(
+        msg.source, msg.content))
     response = "已收到信息"
-    reply = create_reply(response, msg)
-    # print("reply:{}".format(reply))
-    print(response)
+    print("回答:reply:{}".format(response))
+    # reply=create_reply(response, msg)
+    reply = TextReply(content=response, message=msg)
     return reply.render()
 
 
 @app.route('/wechat', methods=['GET', 'POST'])
 def wechat():
+    # 服务器配置验证
     timestamp = request.args.get("timestamp")
     nonce = request.args.get("nonce")
     if request.method == 'GET':
-        # token, signature, timestamp, nonce
+        # 接收参数 token, signature, timestamp, nonce
         echostr = request.args.get("echostr")
         signature = request.args.get("signature")
         if echostr:
@@ -64,6 +68,7 @@ def wechat():
                 return echostr
             except InvalidSignatureException:
                 print("invalid message from request")
+    # 回复功能
     else:
         xml = request.data
         if xml:
@@ -71,12 +76,14 @@ def wechat():
                 msg = parse_message(xml)
                 # print("message from wechat msg:{}".format(msg))
 
-                # t1 = Thread(target=asyncTask, args=(msg.source, msg))
-                # t1.start()
+                t1 = Thread(target=asyncTask, args=(msg.source, msg.content))
+                t1.start()
+                return "success"
 
-                reply_msg(msg)
+                # 简易的回复测试
+                # response = reply_msg(msg)
+                # return response
 
-                # return "success"
             except (InvalidAppIdException, InvalidSignatureException):
                 print("cannot decrypt message!")
         else:
