@@ -10,5 +10,5 @@ print(appid, apikey, secretkey, serviceid)
 
 
 # qianfan.chat(apikey, secretkey, "你好")
-qianfan.chat_with_knowledge_base(
-    apikey, secretkey, serviceid, "今年的招生政策如何？")
+# qianfan.chat_with_knowledge_base(
+#     apikey, secretkey, serviceid, "今年的招生政策如何？")
