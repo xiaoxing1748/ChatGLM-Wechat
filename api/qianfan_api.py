@@ -61,3 +61,23 @@ def chat(apikey, secretkey, content):
 
     print(response.text)
     return response.text
+
+
+# 知识库问答功能
+def chat_with_knowledge_base(apikey, secretkey, serviceid, query):
+    url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/plugin/" + serviceid + "/?access_token=" + get_access_token(apikey, secretkey
+                                                                                                                                    )
+    # print(url)
+    payload = json.dumps({
+        "query": query,
+        "plugins": ["uuid-zhishiku"],
+        "verbose": True
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+    return response.text

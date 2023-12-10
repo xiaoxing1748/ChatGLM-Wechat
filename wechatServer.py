@@ -40,9 +40,12 @@ qianfan_appid, qianfan_apikey, qianfan_secretkey, qianfan_serviceid = config_rea
 
 def asyncTask(source, content):
     print("提问:source:{}, content:{}".format(source, content))
+    response = "已收到信息"
     # response, history = model.chat(tokenizer, content, history=[])
     # response = chatTest.chat(content)
-    response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
+    # response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
+    # response = qianfan.chat_with_knowledge_base(
+    #     qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
     print("回答:reply:{}".format(response))
     # time.sleep(10)
     client.message.send_text(source, response)
