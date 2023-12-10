@@ -6,6 +6,7 @@
 config.yaml
 /knowledge_base/*
 Todo
+test.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

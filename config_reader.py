@@ -22,7 +22,7 @@ config_data = read_config()
 
 
 # 获取wechat_config
-def get_wechat_config():
+def get_wechat_config(config_key=None):
     """
     return appid, appsecret, token\n
     获取微信公众号的配置\n
@@ -31,11 +31,15 @@ def get_wechat_config():
     appid = wechat_config.get("appid", "")
     appsecret = wechat_config.get("appsecret", "")
     token = wechat_config.get("token", "")
-    return appid, appsecret, token
+    if config_key is not None:
+        # 如果指定了config_key，只返回对应的值
+        return wechat_config.get(config_key, "")
+    else:
+        return appid, appsecret, token
 
 
 # 获取qianfan_config
-def get_qianfan_config():
+def get_qianfan_config(config_key=None):
     """
     return appid, apikey, secretkey, serviceid\n
     获取千帆应用配置\n
@@ -45,7 +49,11 @@ def get_qianfan_config():
     apikey = qianfan_config.get("apikey", "")
     secretkey = qianfan_config.get("secretkey", "")
     serviceid = qianfan_config.get("serviceid", "")
-    return appid, apikey, secretkey, serviceid
+    if config_key is not None:
+        # 如果指定了config_key，只返回对应的值
+        return qianfan_config.get(config_key, "")
+    else:
+        return appid, apikey, secretkey, serviceid
 
 
 # 获取url
