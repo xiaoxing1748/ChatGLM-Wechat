@@ -4,3 +4,9 @@ wechat_config:
   token: mytoken
 
 url: /
+
+qianfan_config:
+  appid: myid
+  apikey: myapikey
+  secretkey: mysecretkey
+  serviceid: myserviceid

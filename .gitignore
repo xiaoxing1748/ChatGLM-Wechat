@@ -4,6 +4,8 @@
 /model/*.json
 /backup
 config.yaml
+/knowledge_base/*
+Todo
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

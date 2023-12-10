@@ -2,7 +2,6 @@ import logging
 import datetime
 from flask import Flask
 from flask import request
-import sys
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy import parse_message
@@ -12,26 +11,26 @@ from wechatpy import WeChatClient
 # from transformers import AutoTokenizer, AutoModel
 import time
 from threading import Thread
-import yaml
 # import chatTest
+import config_reader
+import api.qianfan_api as qianfan
+
 
 app = Flask(__name__)
 app.debug = True
 print("启动于:", datetime.datetime.now())
-
-# 读取配置文件
-with open('config.yaml', 'r') as file:
-    config_data = yaml.load(file, Loader=yaml.FullLoader)
-# 公众号信息
-wechat_config = config_data.get('wechat_config', {})
-url = config_data.get('url')
-APP_ID = wechat_config.get('appid')
-APP_SECRET = wechat_config.get('appsecret')
-WECHAT_TOKEN = wechat_config.get('token')
-client = WeChatClient(APP_ID, APP_SECRET)
-
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
+
+
+# 公众号信息
+appid, appsecret, token = config_reader.get_wechat_config()
+url = config_reader.get_url()
+# 公众号客户端配置
+client = WeChatClient(appid, appsecret)
+
+# 千帆信息
+qianfan_appid, qianfan_apikey, qianfan_secretkey, qianfan_serviceid = config_reader.get_qianfan_config()
 
 # tokenizer = AutoTokenizer.from_pretrained(
 #     r"F:\ChatGLM\model", trust_remote_code=True)
@@ -42,8 +41,8 @@ app.logger.addHandler(handler)
 def asyncTask(source, content):
     print("提问:source:{}, content:{}".format(source, content))
     # response, history = model.chat(tokenizer, content, history=[])
-    response = "已收到信息"
     # response = chatTest.chat(content)
+    response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
     print("回答:reply:{}".format(response))
     # time.sleep(10)
     client.message.send_text(source, response)
@@ -73,7 +72,7 @@ def wechat():
             print("request timestamp:{},nonce:{}, echostr:{}, signature:{}".format(timestamp,
                                                                                    nonce, echostr, signature))
             try:
-                check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
+                check_signature(token, signature, timestamp, nonce)
                 return echostr
             except InvalidSignatureException:
                 print("invalid message from request")
