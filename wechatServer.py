@@ -34,7 +34,7 @@ qianfan_appid, qianfan_apikey, qianfan_secretkey, qianfan_serviceid = config_rea
 # 已认证公众号的异步回复
 def asyncTask(source, content):
     print("提问:source:{}, content:{}".format(source, content))
-    # response = "已收到信息"
+    response = "已收到信息"
 
     # 调用本地LangChain
     # response = chatTest.chat(content)
@@ -47,17 +47,44 @@ def asyncTask(source, content):
     # qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
 
     # 调用本地ChatGLM
-    response = chatglm.chat(content)['response']
+    # response = chatglm.chat(content)['response']
 
     print("回答:reply:{}".format(response))
     client.message.send_text(source, response)
 
 
+last_responses = {}
+
+
 # 未认证公众号的同步回复，响应限时5秒
 def reply_msg(msg):
+    global last_responses  # 引用全局变量
+
     print("提问:source:{}, content:{}".format(
         msg.source, msg.content))
-    response = "已收到信息"
+
+    # 如果传入的消息是 "/获取回答"，且来源在字典中存在时，返回对应来源的最后 response 信息
+    if msg.content == "/获取回答" and msg.source in last_responses:
+        response = last_responses[msg.source]
+    else:
+
+        response = "已收到信息"
+
+        # 调用本地LangChain
+        # response = chatTest.chat(content)
+
+        # 调用千帆ChatGLM
+        # response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
+
+        # 调用千帆知识库
+        # response = qianfan.chat_with_knowledge_base(
+        # qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
+
+        # 调用本地ChatGLM
+        # response = chatglm.chat(content)['response']
+
+        last_responses[msg.source] = response  # 存储最后接收到的 response 信息
+
     print("回答:reply:{}".format(response))
     # reply=create_reply(response, msg)
     reply = TextReply(content=response, message=msg)
