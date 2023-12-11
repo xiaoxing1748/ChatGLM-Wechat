@@ -8,12 +8,10 @@ from wechatpy import parse_message
 from wechatpy.replies import create_reply
 from wechatpy.replies import TextReply
 from wechatpy import WeChatClient
-# from transformers import AutoTokenizer, AutoModel
-import time
 from threading import Thread
-# import chatTest
 import service.config_reader.config_reader as config_reader
 import service.api.qianfan_api as qianfan
+import service.api.chatglm_api as chatglm
 
 
 app = Flask(__name__)
@@ -32,26 +30,30 @@ client = WeChatClient(appid, appsecret)
 # 千帆信息
 qianfan_appid, qianfan_apikey, qianfan_secretkey, qianfan_serviceid = config_reader.get_qianfan_config()
 
-# tokenizer = AutoTokenizer.from_pretrained(
-#     r"F:\ChatGLM\model", trust_remote_code=True)
-# model = AutoModel.from_pretrained(
-#     r"F:\ChatGLM\model", trust_remote_code=True).cuda()
 
-
+# 已认证公众号的异步回复
 def asyncTask(source, content):
     print("提问:source:{}, content:{}".format(source, content))
-    response = "已收到信息"
-    # response, history = model.chat(tokenizer, content, history=[])
+    # response = "已收到信息"
+
+    # 调用本地LangChain
     # response = chatTest.chat(content)
+
+    # 调用千帆ChatGLM
     # response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
+
+    # 调用千帆知识库
     # response = qianfan.chat_with_knowledge_base(
-    #     qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
+    # qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
+
+    # 调用本地ChatGLM
+    response = chatglm.chat(content)['response']
+
     print("回答:reply:{}".format(response))
-    # time.sleep(10)
     client.message.send_text(source, response)
 
 
-# 简易的回复测试
+# 未认证公众号的同步回复，响应限时5秒
 def reply_msg(msg):
     print("提问:source:{}, content:{}".format(
         msg.source, msg.content))
@@ -87,11 +89,12 @@ def wechat():
                 msg = parse_message(xml)
                 # print("message from wechat msg:{}".format(msg))
 
+                # 异步回复
                 t1 = Thread(target=asyncTask, args=(msg.source, msg.content))
                 t1.start()
                 return "success"
 
-                # 简易的回复测试
+                # 同步回复
                 # response = reply_msg(msg)
                 # return response
 
@@ -103,5 +106,5 @@ def wechat():
 
 
 if __name__ == '__main__':
-    print('starting wechat of chatGLM')
+    print('正在启动公众号后台')
     app.run(host='127.0.0.1', port=9000, debug=True)
