@@ -12,8 +12,8 @@ from wechatpy import WeChatClient
 import time
 from threading import Thread
 # import chatTest
-import config_reader
-import api.qianfan_api as qianfan
+import service.config_reader.config_reader as config_reader
+import service.api.qianfan_api as qianfan
 
 
 app = Flask(__name__)

@@ -1,11 +1,18 @@
 import yaml
+import os
 
 
 # 读取配置文件
-def read_config(file_path="config.yaml"):
+def read_config(file_path=None):
     """
     return config_data\n
     """
+    if file_path is None:
+        # 获取当前脚本的绝对路径
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        # 从当前脚本的位置找到配置文件
+        file_path = os.path.join(script_dir, "../../config.yaml")
+
     try:
         with open(file_path, "r") as file:
             config_data = yaml.safe_load(file)
@@ -64,3 +71,12 @@ def get_url():
     """
     url = config_data.get("url", "")
     return url
+
+
+def get_llm_path():
+    """
+    return llm_path\n
+    获取llm模型路径\n
+    """
+    llm_path = config_data.get("llm_path", "")
+    return llm_path
