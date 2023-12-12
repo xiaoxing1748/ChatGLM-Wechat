@@ -9,7 +9,6 @@ import requests
 DEVICE = "cuda"
 DEVICE_ID = "0"
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
-# LLM_PATH = r"F:\ChatGLM\model"
 
 
 def torch_gc():
@@ -55,7 +54,9 @@ async def create_item(request: Request):
 
 
 # 启用llm服务
-def run_llm(LLM_PATH):
+def run_llm(LLM_PATH=None):
+    if LLM_PATH is None:
+        LLM_PATH = r"F:\ChatGLM\model"
     global model, tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
         LLM_PATH, trust_remote_code=True)
@@ -97,14 +98,4 @@ def chat(prompt, history=None, max_length=None, top_p=None, temperature=None):
 
 
 if __name__ == '__main__':
-    LLM_PATH = r"F:\ChatGLM\model"
-    tokenizer = AutoTokenizer.from_pretrained(
-        LLM_PATH, trust_remote_code=True)
-    model = AutoModel.from_pretrained(
-        LLM_PATH, trust_remote_code=True).cuda()
-    # 多显卡支持，使用下面三行代替上面两行，将num_gpus改为你实际的显卡数量
-    # model_path = LLM_PATH
-    # tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
-    # model = load_model_on_gpus(model_path, num_gpus=2)
-    model.eval()
-    uvicorn.run(app, host='0.0.0.0', port=8000, workers=1)
+    run_llm()

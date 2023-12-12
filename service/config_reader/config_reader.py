@@ -73,6 +73,7 @@ def get_url():
     return url
 
 
+# 获取llm_path
 def get_llm_path():
     """
     return llm_path\n
@@ -80,3 +81,13 @@ def get_llm_path():
     """
     llm_path = config_data.get("llm_path", "")
     return llm_path
+
+
+# 获取embedding_path
+def get_embedding_path():
+    """
+    return embedding_path\n
+    获取embedding模型路径\n
+    """
+    embedding_path = config_data.get("embedding_path", "")
+    return embedding_path

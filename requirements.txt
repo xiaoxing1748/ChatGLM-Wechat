@@ -1,10 +1,12 @@
 transformers>=4.30.2
-gradio
+# gradio
 faiss-cpu
 langchain
 sentence_transformers
 nltk
-beautifulsoup4
+# beautifulsoup4
 wechatpy
 flask
-torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+# torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
+# winget install jqlang.jq
+# jq
