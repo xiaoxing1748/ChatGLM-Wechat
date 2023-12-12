@@ -1,3 +1,4 @@
+# https://python.langchain.com/docs/modules/data_connection/document_loaders
 import pprint
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.document_loaders import JSONLoader
@@ -26,7 +27,7 @@ def load_json(filepath):
         jq_schema='.messages[].content',
         text_content=False)
     data = loader.load()
-    # pprint(data)
+    pprint(data)
     return data
 
 

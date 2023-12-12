@@ -1,3 +1,4 @@
+# https://python.langchain.com/docs/modules/data_connection/document_transformers/text_splitters/character_text_splitter
 from langchain.text_splitter import CharacterTextSplitter
 import re
 from typing import List

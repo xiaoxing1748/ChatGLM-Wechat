@@ -1,3 +1,4 @@
+# https://python.langchain.com/docs/integrations/llms/chatglm
 from langchain.chains import LLMChain
 from langchain.llms import ChatGLM
 from langchain.prompts import PromptTemplate

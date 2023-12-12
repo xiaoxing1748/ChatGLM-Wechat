@@ -10,3 +10,9 @@ qianfan_config:
   apikey: myapikey
   secretkey: mysecretkey
   serviceid: myserviceid
+
+llm_path: F:\ChatGLM\model
+# llm_path: THUDM/ChatGLM2-6B-int4
+
+embedding_path: F:\ChatGLM\embedding\bge-large-zh-v1.5
+# embedding_path: BAAI/bge-large-zh-v1.5
