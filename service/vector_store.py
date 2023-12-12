@@ -19,11 +19,11 @@ def search(query, document_path):
     # 查询带分数的向量
     docs = vector_store.similarity_search_with_score(query)
     # 返回索引第一条的page_content
-    print(docs[0].page_content)
+    # print(docs[0].page_content)
     # print("\n")
-    # # 或者遍历输出
-    # for doc in docs:
-    #     print(doc)
+    # 或者遍历输出
+    for doc in docs:
+        print(doc)
 
 
 if __name__ == '__main__':
