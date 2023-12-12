@@ -1,6 +1,8 @@
 from langchain.embeddings import HuggingFaceBgeEmbeddings
 from text_splitter.chinese_text_splitter import ChineseTextSplitter
 import document_loader
+from langchain.vectorstores import FAISS
+from langchain.schema import Document
 
 
 def load(model_name=None):
@@ -21,9 +23,11 @@ def load(model_name=None):
 
 
 if __name__ == '__main__':
-    embedding = load()
-    print(len(embedding.embed_query("文章标题")))
-    text = document_loader.load("./document/test.txt")
-    splitter = ChineseTextSplitter()
-    splited_text = splitter.split_text(text[0].page_content)
-    print(splited_text)
+    embeddings = load()
+    text = document_loader.load_and_split_unstructured("./document/test.txt")
+    print(text)
+    vector_store = FAISS.from_documents(text, embeddings)
+    query = "智能手机"
+    docs = vector_store.similarity_search(query)
+    # 返回索引第一条
+    print(docs[0].page_content)
