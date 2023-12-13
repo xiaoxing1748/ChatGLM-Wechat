@@ -54,4 +54,4 @@ def chat(question):
     # return response
 
 
-print(chat("软骨箱"))
+print(chat("丁真"))

@@ -7,6 +7,7 @@ config.yaml
 /knowledge_base/*
 Todo
 test.py
+faiss_index
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

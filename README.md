@@ -41,17 +41,17 @@ ChatGLM-Wechat:.
 
 - [ ] venv 虚拟环境 在做了
 - [x] 改善提示词
-- [ ] 优化逻辑，在启动项目时立刻使用读取并构建向量库 在做了
-- [ ] ~~回复“/刷新”清除历史对话~~ 不做了
-- [ ] 多轮对话 注：仅限 api 版
+- [x] 优化逻辑，在启动项目时立刻使用读取并构建向量库 在做了
+- [ ] 回复“/刷新”清除历史对话 
+- [ ] 多轮对话 仅限 api 版 鸽了
 
-#### 面板功能：不重要总体先鸽
+#### ~~面板功能：~~  全鸽了
 
-- [ ] 管理知识库
-- [ ] 切换模型和 embeddings
-- [ ] 问答功能
-- [ ] ~~参数调节（分割和历史长度）~~ 不需要了
-- [ ] ~~切换 GPU（也许毫无意义）~~ 用不着
+- [ ] ~~管理知识库~~
+- [ ] ~~切换模型和 embeddings~~
+- [ ] ~~问答功能~~
+- [ ] ~~参数调节（分割和历史长度）~~
+- [ ] ~~切换 GPU（也许毫无意义）~~
 
 #### 回复功能：
 
@@ -71,10 +71,10 @@ ChatGLM-Wechat:.
 
 ### **参考内容：**
 
-​ 开发文档: [wechatpy 官方文档](https://wechatpy.readthedocs.io/zh_CN/master/)
+ 开发文档: [wechatpy 官方文档](https://wechatpy.readthedocs.io/zh_CN/master/)
 
-​ webui 参考: [LangChain-ChatGLM-Webui](https://github.com/thomas-yanxin/LangChain-ChatGLM-Webui)
+ webui 参考: [LangChain-ChatGLM-Webui](https://github.com/thomas-yanxin/LangChain-ChatGLM-Webui)
 
-​ 框架原理: [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat)
+ 框架原理: [Langchain-Chatchat](https://github.com/chatchat-space/Langchain-Chatchat)
 
-​ 模型: [ChatGLM2-6B](https://github.com/THUDM/ChatGLM2-6B)
+ 模型: [ChatGLM2-6B](https://github.com/THUDM/ChatGLM2-6B)
