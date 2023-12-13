@@ -5,11 +5,13 @@ from typing import List
 
 
 class ChineseTextSplitter(CharacterTextSplitter):
+    # 重写了split_text方法 要用其他方法的话主方法名为split_text
     def __init__(self, pdf: bool = False, sentence_size: int = 250, **kwargs):
         super().__init__(**kwargs)
         self.pdf = pdf
         self.sentence_size = sentence_size
 
+    # 简易分段
     def split_text1(self, text: str) -> List[str]:
         if self.pdf:
             text = re.sub(r"\n{3,}", "\n", text)
@@ -25,7 +27,8 @@ class ChineseTextSplitter(CharacterTextSplitter):
                 sent_list.append(ele)
         return sent_list
 
-    def split_text(self, text: str):  # 此处需要进一步优化逻辑
+    # 通用的中文分段
+    def split_text2(self, text: str):  # 此处需要进一步优化逻辑
         if self.pdf:
             text = re.sub(r"\n{3,}", r"\n", text)
             text = re.sub('\s', " ", text)
@@ -64,17 +67,24 @@ class ChineseTextSplitter(CharacterTextSplitter):
                 ls = ls[:id] + [i for i in ele1_ls if i] + ls[id + 1:]
         return ls
 
-    def split_text2(self, text: str) -> List[str]:
-        if self.pdf:
-            text = re.sub(r"\n{3,}", "\n", text)
-            text = re.sub('\s', ' ', text)
-            text = text.replace("\n\n", "")
-        sent_sep_pattern = re.compile(
-            '([﹒﹔﹖﹗．。！？]["’”」』]{0,2}|(?=["‘“「『]{1,2}|$))')
-        sent_list = []
-        for ele in sent_sep_pattern.split(text):
-            if sent_sep_pattern.match(ele) and sent_list:
-                sent_list[-1] += ele
-            elif ele:
-                sent_list.append(ele)
-        return sent_list
+    # 自定义 使用一个回车分行两个回车分段
+    def split_text(self, text: str):
+        # 将连续两个以上的换行符替换为一个换行符
+        text = re.sub(r"\n{2,}", r"\n", text)
+
+        # 将处理后的文本按换行符分割成列表
+        sentences = [sentence.strip()
+                     for sentence in text.split("\n") if sentence]
+
+        # 处理超过长度阈值的句子
+        for i in range(len(sentences)):
+            if len(sentences[i]) > self.sentence_size:
+                # 将句子中的两个回车符作为断句符
+                sentences[i] = re.sub(r'\n\n', r'\n', sentences[i])
+
+                # 将断句后的子句添加到列表中
+                sub_sentences = [sub_sentence.strip(
+                ) for sub_sentence in sentences[i].split("\n") if sub_sentence]
+                sentences = sentences[:i] + sub_sentences + sentences[i + 1:]
+
+        return sentences

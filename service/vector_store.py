@@ -13,6 +13,7 @@ embedding = embeddings.load(embedding_path)
 def index(document_path):
     # 加载并分割文档
     text = document_loader.load_and_split_unstructured(document_path)
+    # 输出分割完的文档
     print(text)
     # 构建向量存储
     vector_store = FAISS.from_documents(text, embedding)
@@ -28,9 +29,8 @@ def search(query, document_path):
     # docs = vector_store.similarity_search(query)
     # 查询带分数的向量
     docs = vector_store.similarity_search_with_score(query)
-    # 返回索引第一条的page_content
+    # 输出索引第一条的page_content
     # print(docs[0].page_content)
-    # print("\n")
     # 或者遍历输出
     # for doc in docs:
     #     print(doc)
@@ -45,7 +45,7 @@ def load_and_search(query):
 
 
 if __name__ == '__main__':
-    docs = search("丁真问啥牌子的啤酒味道好", "./document/news.txt")
+    docs = search("摘要", "./document/news.txt")
     # docs = load_and_search("星期四")
     for doc in docs:
         print(doc)
