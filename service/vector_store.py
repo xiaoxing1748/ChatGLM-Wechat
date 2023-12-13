@@ -3,6 +3,8 @@ import document_loader
 from langchain.vectorstores import FAISS
 import embeddings
 from config_reader import config_reader
+from langchain.prompts import PromptTemplate
+
 
 # 加载embedding
 embedding_path = config_reader.get_embedding_path()
@@ -49,3 +51,8 @@ if __name__ == '__main__':
     # docs = load_and_search("星期四")
     for doc in docs:
         print(doc)
+    context = []
+    # 遍历docs中的每个元素，提取page_content并添加到context
+    for doc in docs:
+        context.append(doc[0].page_content)
+    print(context)
