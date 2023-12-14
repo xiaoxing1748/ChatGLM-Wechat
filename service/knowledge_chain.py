@@ -2,20 +2,19 @@
 from langchain.chains import LLMChain
 from langchain.llms import ChatGLM
 from langchain.prompts import PromptTemplate
-from langchain.schema import StrOutputParser
-from langchain.chains import RetrievalQA
-import llm as llm_gpt
-import service.faiss_vector_store as faiss_vector_store
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain.prompts import ChatPromptTemplate
+from langchain.chat_models import QianfanChatEndpoint
+import api.qianfan_api as qianfan_api
+from config_loader import ConfigLoader
+from langchain_core.language_models.chat_models import HumanMessage
+import os
+import faiss_vector_store as faiss_vector_store
 
 
-def get_knowledge_based_answer(context=None, question=None):
-    answer = ""
-    return answer
-
-
-# Legacy mode
-def llm_run(question=None, docs=None):
-
+# Legacy LLM chain
+def llm_chain_legacy(question=None, docs=None):
     context = []
     # 遍历docs中的每个元素，提取page_content并添加到context
     for doc in docs:
@@ -32,9 +31,55 @@ def llm_run(question=None, docs=None):
     {question}"""
     prompt = PromptTemplate(template=template, input_variables=[
                             "context", "question"])
+    model = chatglm()
+    llm_chain = LLMChain(prompt=prompt, llm=model)
+    answer = llm_chain.run(question=question, context=context)
+    return answer
 
+
+# LECL LLM chain
+# https://python.langchain.com/docs/expression_language/get_started#rag-search-example
+def llm_chain(question=None, context=None, prompt=None):
+
+    if prompt is None:
+        # 两种prompt模板不同 前者具有角色配置
+        # prompt = ChatPromptTemplate.from_template(
+        #     "{question}"
+        # )
+        prompt = PromptTemplate.from_template(
+            "{question}"
+            # "基于以下【已知内容】的问答对，回答用户提出的【问题】，并遵循如下规则：\n1、每个问答对的问题以ask:开头，而回答以answer:开头。\n2、你的回答不应该以“根据已知内容”开头，请直接进行回答。\n3、如果无法从中得到答案，请说 '抱歉，我无法回答该问题'，此外不允许在答案中添加编造成分。\n【已知内容】:\n{context} \n【问题】:\n{question}"
+        )
+    output_parser = StrOutputParser()
+    model = chatglm()
+    chain = (
+        {"question": RunnablePassthrough()}
+        | prompt
+        | model
+        | output_parser
+    )
+    return chain.invoke(question)
+
+
+# qianfan mode 没写完
+# https://python.langchain.com/docs/integrations/chat/baidu_qianfan_endpoint
+# langchain的问题暂时用不了 qianfan.errors.AccessTokenExpiredError
+def qianfan_chain(accesskey, secretkey, content, model=None):
+    os.environ["QIANFAN_AK"] = accesskey
+    os.environ["QIANFAN_SK"] = secretkey
+    chat = QianfanChatEndpoint(
+        model=model,
+    )
+    # res = chat([HumanMessage(content=content)])
+    res = chat([HumanMessage(content=content)])
+    return res
+
+
+# 单独实例化模型
+def chatglm():
+    """return llm\n
+    实例化LLM模型"""
     endpoint_url = "http://127.0.0.1:8000"
-
     llm = ChatGLM(
         endpoint_url=endpoint_url,
         max_token=8000,
@@ -42,30 +87,10 @@ def llm_run(question=None, docs=None):
         top_p=0.9,
         model_kwargs={"sample_model_args": False},
     )
-
-    llm_chain = LLMChain(prompt=prompt, llm=llm)
-    answer = llm_chain.run(question=question, context=context)
-    return answer
+    return llm
 
 
-# LECL mode
-def llm_run1(question=None):
-    prompt = PromptTemplate.from_template(
-        "{question}"
-    )
-    runnable = prompt | llm_run() | StrOutputParser()
-    runnable.invoke({"question": question})
-    # return runnable
-
-
-if __name__ == '__main__':
-    question = "你的已知内容有什么？"
-    # question = ""
-    # docs = vector_store.search(question, "./document/news.txt")
-    faiss_vector_store = faiss_vector_store.index("./document/news.txt")
-    # answer = llm_run(question=question, docs=docs)
-    # print(answer)
-
+def prompt_template(context=None, question=None):
     template = """基于以下【已知内容】的问答对，回答用户提出的【问题】，并遵循如下规则：
     1、每个问答对的问题以ask:开头，而回答以answer:开头。
     2、你的回答不应该以“根据已知内容”开头，请直接进行回答。
@@ -78,11 +103,19 @@ if __name__ == '__main__':
     {question}"""
     prompt = PromptTemplate(template=template, input_variables=[
                             "context", "question"])
-    qa_chain = RetrievalQA.from_chain_type(
-        llm_gpt.chatglm(),
-        retriever=faiss_vector_store.as_retriever(),
-        chain_type_kwargs={"prompt": prompt}
-    )
+    return prompt
+
+
+if __name__ == '__main__':
+
     question = "今年是哪一年？"
-    result = qa_chain({"query": question})
-    result["result"]
+    # llm_run(question)
+    docs = faiss_vector_store.search("question", "./document/news.txt")
+    print(llm_chain_legacy(question, docs))
+    print(llm_chain("今年是哪一年？", "ask:今年是哪一年？ answer:今年是2025年"))
+
+    # config = ConfigLoader()
+    # sdkaccesskey = config.get_qianfan_config("sdkaccesskey")
+    # sdksecretkey = config.get_qianfan_config("sdksecretkey")
+    # model = config.get_qianfan_config("model")
+    # print(qianfan_chain(sdkaccesskey, sdksecretkey, "你好", model=model))
