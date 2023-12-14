@@ -1,10 +1,13 @@
 transformers>=4.30.2
 # gradio
 faiss-cpu
+chroma
+lark
 langchain
 sentence_transformers
 nltk
 # beautifulsoup4
+# 注：使用wechatpya26
 wechatpy
 flask
 # torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117

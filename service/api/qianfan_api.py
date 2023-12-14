@@ -1,6 +1,8 @@
 
 import requests
 import json
+import os
+import qianfan
 
 
 # 获取access_token
@@ -81,3 +83,23 @@ def chat_with_knowledge_base(apikey, secretkey, serviceid, query):
 
     print(response.text)
     return response.text
+
+
+# ChatSDK
+def qianfan_chat(accesskey, secretkey, content, appid=None, model=None):
+    # 使用安全认证AK/SK鉴权，通过环境变量方式初始化；替换下列示例中参数，安全认证Access Key替换your_iam_ak，Secret Key替换your_iam_sk
+    os.environ["QIANFAN_ACCESS_KEY"] = accesskey
+    os.environ["QIANFAN_SECRET_KEY"] = secretkey
+
+    # 通过AppID设置使用的应用，该参数可选；如果不设置该参数，SDK默认使用最新创建的应用AppID；如果设置，使用如下代码，替换示例中参数，应用AppID替换your_AppID
+    if appid is not None:
+        os.environ["QIANFAN_APPID"] = str(appid)
+
+    chat_comp = qianfan.ChatCompletion()
+
+    # 指定特定模型
+    resp = chat_comp.do(model="ChatGLM2-6B-32K", messages=[{
+        "role": "user",
+        "content": content
+    }])
+    return resp

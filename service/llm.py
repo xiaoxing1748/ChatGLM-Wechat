@@ -5,9 +5,14 @@ from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain.prompts import ChatPromptTemplate
+from langchain.chat_models import QianfanChatEndpoint
+import api.qianfan_api as qianfan_api
+from config_loader import ConfigLoader
+from langchain_core.language_models.chat_models import HumanMessage
+import os
 
 
-# Legacy mode
+# Legacy LLM mode
 def llm_run(question=None):
     template = """基于以下【已知内容】，请简洁并专业地回答用户提出的【问题】。如果无法从中得到答案，请说 "根据已知信息无法回答该问题"，此外不允许在答案中添加编造成分。【已知内容】:{context}【问题】:{question}"""
     prompt = PromptTemplate(template=template, input_variables=["question"])
@@ -17,7 +22,7 @@ def llm_run(question=None):
     return answer
 
 
-# LECL mode
+# LECL LLM mode
 # https://python.langchain.com/docs/expression_language/get_started#rag-search-example
 def llm_chain(question=None, context=None, prompt=None):
 
@@ -39,6 +44,20 @@ def llm_chain(question=None, context=None, prompt=None):
         | output_parser
     )
     return chain.invoke(question)
+
+
+# qianfan mode
+# https://python.langchain.com/docs/integrations/chat/baidu_qianfan_endpoint
+# langchain的问题暂时用不了 qianfan.errors.AccessTokenExpiredError
+def qianfan_chain(accesskey, secretkey, content, model=None):
+    os.environ["QIANFAN_AK"] = accesskey
+    os.environ["QIANFAN_SK"] = secretkey
+    chat = QianfanChatEndpoint(
+        model=model,
+    )
+    # res = chat([HumanMessage(content=content)])
+    res = chat([HumanMessage(content=content)])
+    return res
 
 
 # 单独实例化模型
@@ -77,4 +96,9 @@ if __name__ == '__main__':
     # question = "北京和上海两座城市有什么不同？"
     # llm_run(question)
     # print(llm_chain("你好"))
-    print(llm_chain("今年是哪一年？", "ask:今年是哪一年？ answer:今年是2025年"))
+    # print(llm_chain("今年是哪一年？", "ask:今年是哪一年？ answer:今年是2025年"))
+    config = ConfigLoader()
+    sdkaccesskey = config.get_qianfan_config("sdkaccesskey")
+    sdksecretkey = config.get_qianfan_config("sdksecretkey")
+    model = config.get_qianfan_config("model")
+    print(qianfan_chain(sdkaccesskey, sdksecretkey, "你好", model=model))
