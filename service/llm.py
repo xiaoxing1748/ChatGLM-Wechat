@@ -18,6 +18,7 @@ def llm_run(question=None):
 
 
 # LECL mode
+# https://python.langchain.com/docs/expression_language/get_started#rag-search-example
 def llm_chain(question=None, context=None, prompt=None):
 
     if prompt is None:
@@ -42,6 +43,8 @@ def llm_chain(question=None, context=None, prompt=None):
 
 # 单独实例化模型
 def chatglm():
+    """return llm\n
+    实例化LLM模型"""
     endpoint_url = "http://127.0.0.1:8000"
     llm = ChatGLM(
         endpoint_url=endpoint_url,

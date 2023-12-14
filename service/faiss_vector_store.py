@@ -3,7 +3,6 @@ import document_loader
 from langchain.vectorstores import FAISS
 import embeddings
 from config_reader import config_reader
-from langchain.prompts import PromptTemplate
 
 
 # 加载embedding
@@ -11,7 +10,7 @@ embedding_path = config_reader.get_embedding_path()
 embedding = embeddings.load(embedding_path)
 
 
-# 向量存储
+# FAISS向量存储
 def index(document_path):
     # 加载并分割文档
     text = document_loader.load_and_split_unstructured(document_path)
@@ -31,11 +30,6 @@ def search(query, document_path):
     # docs = vector_store.similarity_search(query)
     # 查询带分数的向量
     docs = vector_store.similarity_search_with_score(query)
-    # 输出索引第一条的page_content
-    # print(docs[0].page_content)
-    # 或者遍历输出
-    # for doc in docs:
-    #     print(doc)
     return docs
 
 
@@ -51,6 +45,7 @@ if __name__ == '__main__':
     # docs = load_and_search("星期四")
     for doc in docs:
         print(doc)
+    print("--------------------")
     context = []
     # 遍历docs中的每个元素，提取page_content并添加到context
     for doc in docs:
