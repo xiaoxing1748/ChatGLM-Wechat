@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.schema import StrOutputParser
 from langchain.chains import RetrievalQA
 import llm as llm_gpt
-import vector_store
+import service.faiss_vector_store as faiss_vector_store
 
 
 def get_knowledge_based_answer(context=None, question=None):
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     question = "你的已知内容有什么？"
     # question = ""
     # docs = vector_store.search(question, "./document/news.txt")
-    vector_store = vector_store.index("./document/news.txt")
+    faiss_vector_store = faiss_vector_store.index("./document/news.txt")
     # answer = llm_run(question=question, docs=docs)
     # print(answer)
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
                             "context", "question"])
     qa_chain = RetrievalQA.from_chain_type(
         llm_gpt.chatglm(),
-        retriever=vector_store.as_retriever(),
+        retriever=faiss_vector_store.as_retriever(),
         chain_type_kwargs={"prompt": prompt}
     )
     question = "今年是哪一年？"

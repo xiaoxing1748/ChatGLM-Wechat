@@ -2,12 +2,10 @@
 import document_loader
 from langchain.vectorstores import FAISS
 import embeddings
-from config_reader import config_reader
 
 
 # 加载embedding
-embedding_path = config_reader.get_embedding_path()
-embedding = embeddings.load(embedding_path)
+embedding = embeddings.load()
 
 
 # FAISS向量存储

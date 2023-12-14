@@ -9,7 +9,7 @@ from wechatpy.replies import create_reply
 from wechatpy.replies import TextReply
 from wechatpy import WeChatClient
 from threading import Thread
-import service.config_reader.config_reader as config_reader
+from service.config_loader import ConfigLoader
 import service.api.qianfan_api as qianfan
 import service.api.chatglm_api as chatglm
 
@@ -22,13 +22,18 @@ app.logger.addHandler(handler)
 
 
 # 公众号信息
-appid, appsecret, token = config_reader.get_wechat_config()
-url = config_reader.get_url()
+config = ConfigLoader()
+wechat_appid = config.get_wechat_config("appid")
+wechat_appsecret = config.get_wechat_config("appsecret")
+wechat_token = config.get_wechat_config("token")
+url = config.get_url_path()
 # 公众号客户端配置
-client = WeChatClient(appid, appsecret)
+client = WeChatClient(wechat_appid, wechat_appsecret)
 
 # 千帆信息
-qianfan_appid, qianfan_apikey, qianfan_secretkey, qianfan_serviceid = config_reader.get_qianfan_config()
+qianfan_apikey = config.get_qianfan_config("apikey")
+qianfan_secretkey = config.get_qianfan_config("secretkey")
+qianfan_serviceid = config.get_qianfan_config("serviceid")
 
 
 # 已认证公众号的异步回复
@@ -104,7 +109,7 @@ def wechat():
             print("request timestamp:{},nonce:{}, echostr:{}, signature:{}".format(timestamp,
                                                                                    nonce, echostr, signature))
             try:
-                check_signature(token, signature, timestamp, nonce)
+                check_signature(wechat_token, signature, timestamp, nonce)
                 return echostr
             except InvalidSignatureException:
                 print("invalid message from request")

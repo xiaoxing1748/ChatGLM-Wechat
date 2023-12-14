@@ -3,6 +3,7 @@ from langchain.embeddings import HuggingFaceBgeEmbeddings
 from langchain.embeddings import HuggingFaceEmbeddings
 import document_loader
 from langchain.vectorstores import FAISS
+from config_loader import ConfigLoader
 
 
 # 加载embedding
@@ -12,11 +13,7 @@ def load(model_name=None):
     encode_kwargs = {'normalize_embeddings': True}
 
     if model_name is None:
-        # model_name = r"F:\ChatGLM\embedding\bge-large-zh-v1.5"
-        # 缺省embeddings
-        # model_name = "BAAI/bge-large-zh-v1.5"
-        print("model_name is None")
-        return 0
+        model_name = ConfigLoader().get_embedding_path()
 
     # 匹配BGE embeddings 其他懒得写了照抄文档就行
     # https://python.langchain.com/docs/integrations/text_embedding
@@ -30,6 +27,7 @@ def load(model_name=None):
         model = HuggingFaceEmbeddings(
             model_name=model_name,
             model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs,
         )
     return model
 
