@@ -22,7 +22,7 @@ print("启动于:", datetime.datetime.now())
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
 
-
+config = config()
 # 公众号信息
 wechat_appid = config.get_wechat_config("appid")
 wechat_appsecret = config.get_wechat_config("appsecret")
@@ -32,6 +32,10 @@ url = config.get_url_path()
 client = WeChatClient(wechat_appid, wechat_appsecret)
 
 
+docs = faiss_vector_store.search("question", "./document/news.txt")
+
+# 回复缓存
+last_responses = {}
 
 
 # 已认证公众号的异步回复
@@ -54,9 +58,6 @@ def asyncTask(source, content):
 
     print("回答:reply:{}".format(response))
     client.message.send_text(source, response)
-
-
-last_responses = {}
 
 
 # 未认证公众号的同步回复，响应限时5秒
@@ -138,5 +139,8 @@ def wechat():
 if __name__ == '__main__':
     print('正在启动公众号后台')
     # app.run(host='127.0.0.1', port=9000, debug=True)
-    docs = faiss_vector_store.search("question", "./document/news.txt")
-    print(knowledge_chain.llm_chain(docs)
+    # docs = faiss_vector_store.search("question", "./document/news.txt")
+    # print(knowledge_chain.qianfan_chain("什么啤酒好喝？", docs))
+    # print(qianfan.chat_with_knowledge_base("你好"))
+    print(qianfan.chat("你好"))
+    # print(qianfan.get_access_token())

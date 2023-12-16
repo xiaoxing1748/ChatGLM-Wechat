@@ -4,7 +4,7 @@ from langchain.llms import ChatGLM
 
 def chatglm(endpoint_url=None):
     """return llm\n
-    实例化LLM模型"""
+    实例化LLM对象"""
     if endpoint_url is None and endpoint_url != "":
         endpoint_url = "http://127.0.0.1:8000"
     llm = ChatGLM(

@@ -3,21 +3,33 @@ import requests
 import json
 import os
 import qianfan
+import time
 from config_loader import ConfigLoader as config
 
 
+config = config()
 # 千帆信息
-qianfan_apikey = config.get_qianfan_config("apikey")
-qianfan_secretkey = config.get_qianfan_config("secretkey")
-qianfan_serviceid = config.get_qianfan_config("serviceid")
+apikey = config.get_qianfan_config("apikey")
+secretkey = config.get_qianfan_config("secretkey")
+serviceid = config.get_qianfan_config("serviceid")
+
+
+# 缓存access_token
+cached_token = None
+cached_token_expiration = None
 
 
 # 获取access_token
-def get_access_token(apikey, secretkey):
+def get_access_token(apikey=None, secretkey=None):
     """
     使用 API Key，Secret Key 获取access_token，替换下列示例中的应用API Key、应用Secret Key
     """
-
+    global cached_token, cached_token_expiration
+    current_time = time.time()
+    # 检查缓存的token是否仍然有效
+    if cached_token and cached_token_expiration > current_time:
+        return cached_token
+    # 缓存的token无效，重新获取
     url = "https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=" + \
         apikey+"&client_secret="+secretkey
 
@@ -26,15 +38,21 @@ def get_access_token(apikey, secretkey):
         'Content-Type': 'application/json',
         'Accept': 'application/json'
     }
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    return response.json().get("access_token")
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        cached_token = response.json().get("access_token")
+        # 预设token有效期为30-1天
+        cached_token_expiration = current_time + 30 * 23 * 60 * 60
+        return cached_token
+    except requests.RequestException as e:
+        print(f"获取token失败: {e}")
+        return None
 
 
 # 聊天功能
-def chat(apikey, secretkey, content):
+def chat(content):
     """
-    return response.text\n
+    return response -> json\n
     返回示例\n
     {
     "id": "as-bcmt5ct4iy",
@@ -66,17 +84,24 @@ def chat(apikey, secretkey, content):
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-
-    print(response.text)
-    return response.text
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        print(response.text)
+        # print(json.loads(response)["result"])
+        return response
+    except requests.RequestException as e:
+        print(f"聊天请求失败: {e}")
+        return "聊天请求异常"
 
 
 # 知识库问答功能
-def chat_with_knowledge_base(apikey, secretkey, serviceid, query):
+def chat_with_knowledge_base(query):
+    """
+    return response -> json"""
+    # global serviceid, apikey, secretkey
     url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/plugin/" + serviceid + "/?access_token=" + get_access_token(apikey, secretkey
                                                                                                                                     )
-    # print(url)
+    print(query)
     payload = json.dumps({
         "query": query,
         "plugins": ["uuid-zhishiku"],
@@ -86,10 +111,14 @@ def chat_with_knowledge_base(apikey, secretkey, serviceid, query):
         'Content-Type': 'application/json'
     }
 
-    response = requests.request("POST", url, headers=headers, data=payload)
-
-    print(response.text)
-    return response.text
+    try:
+        response = requests.request("POST", url, headers=headers, data=payload)
+        print(response.text)
+        # print(json.loads(response)["result"])
+        return response
+    except requests.RequestException as e:
+        print(f"聊天请求失败: {e}")
+        return "聊天请求异常"
 
 
 # ChatSDK
@@ -110,3 +139,7 @@ def qianfan_chat(accesskey, secretkey, content, appid=None, model=None):
         "content": content
     }])
     return response
+
+
+if __name__ == "__main__":
+    print(chat("你好"))

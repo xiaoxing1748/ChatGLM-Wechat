@@ -11,22 +11,24 @@ ChatGLM-Wechat:.
 ├─config.yaml #配置
 ├─requirements.txt #依赖
 ├─Setup.py #项目首次启动安装依赖，然后启动main.py服务
-├─wechatServer.py #服务器连接API
+├─wechatserver.py #服务器连接API
 ├─main.py #主服务
-├─webUI.py #后台面板
 ├─document #知识库目录
 |   └news.txt #知识库文件
 ├─models #本地LLM模型目录
 |   └chatglm2-6b-int4 #单个模型的目录
 ├─embeddings #本地Embedding模型目录
 |   └bge-large-zh-v1.5 #单个模型的目录
-└─service #各项服务
-    ├api
-    ├config_reader
-    ├text_splitter
-    ├document_loader.py
-    ├embedding.py
-    └llm.py
+|
+├─config_loader.py #配置加载器
+├─qianfan_api.py #千帆api
+├─chatglm_api.py #chatglm api
+├─document_loader.py #文档加载器
+├─text_splitter.py #文本分割器
+├─embeddings.py #嵌入加载器
+├─faiss_vector_store.py #faiss向量存储器
+├─knowledge_chain.py #知识库链
+└─llm.py #实例化的LLM
 ```
 
 ---
@@ -39,15 +41,14 @@ ChatGLM-Wechat:.
 
 #### 架构功能：还在做
 
-- [ ] venv 虚拟环境 在做了
+- [x] venv 虚拟环境 在做了
 - [x] 改善提示词
-- [ ] ~~回复“/刷新”清除历史对话~~  不需要了
-- [ ] 多轮对话 仅限 api 版 鸽了
-- [ ] 改进配置功能
+- [ ] ~~多轮对话 仅限 api 版~~  多轮对话费钱不做了
+- [x] 改进配置功能
 
 #### 问答功能：
 
-- [ ] 本地知识库+云端模型 在做了
+- [x] 本地知识库+云端模型
 - [x] 本地知识库+本地模型
 - [x] 云端知识库+云端模型
 

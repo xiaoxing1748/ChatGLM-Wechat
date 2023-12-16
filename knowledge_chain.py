@@ -68,13 +68,13 @@ def llm_chain(question):
 
 # LCEL QA chain
 # https://python.langchain.com/docs/expression_language/how_to/map
-def qa_chain(question, docs=None):
+def qa_chain(question, docs):
     context = []
     # 遍历docs中的每个元素，提取page_content并添加到context
     for doc in docs:
         context.append(doc[0].page_content)
     template = f"""基于以下【已知内容】，回答用户提出的【问题】，并遵循如下规则：
-    1、每条page_content=''中包含的内容就是已知信息
+    1、每个问答对的问题以ask:开头，而回答以answer:开头。
     2、你的回答不应该以“根据已知内容”开头，请直接进行回答。
     3、如果无法从中得到答案，请说 "抱歉，我无法回答该问题"，此外不允许在答案中添加编造成分。
 
@@ -104,9 +104,9 @@ def qa_chain(question, docs=None):
     return chain.invoke(question)
 
 
-# qianfan mode
+# qianfan chain
 # https://python.langchain.com/docs/integrations/chat/baidu_qianfan_endpoint
-def qianfan_chain(qianfan_apikey, qianfan_secretkey, content, question):
+def qianfan_chain(question, docs):
 
     # def qianfan_chain(accesskey, secretkey, content, model=None):
     # langchain框架的千帆模板坏了:qianfan.errors.AccessTokenExpiredError
@@ -122,10 +122,9 @@ def qianfan_chain(qianfan_apikey, qianfan_secretkey, content, question):
     # 遍历docs中的每个元素，提取page_content并添加到context
     for doc in docs:
         context.append(doc[0].page_content)
-    content = f"""基于以下【已知内容】，回答用户提出的【问题】，并遵循如下规则：
-    1、每条page_content=''中包含的内容就是已知信息
-    2、你的回答不应该以“根据已知内容”开头，请直接进行回答。
-    3、如果无法从中得到答案，请说 "抱歉，我无法回答该问题"，此外不允许在答案中添加编造成分。
+    content = f"""基于以下【已知内容】，简短且专业地回答用户提出的【问题】，并遵循如下规则：
+    1、【已知内容】中每个问答对以ask:开头，而回答以answer:开头。
+    2、你的回答不应该以“根据已知内容”开头，请直接进行回答，不允许在答案中添加编造成分。
 
     【已知内容】:
     {context}
@@ -135,8 +134,7 @@ def qianfan_chain(qianfan_apikey, qianfan_secretkey, content, question):
     
     【回答】:
     """
-    response = qianfan.chat(
-        qianfan_apikey, qianfan_secretkey,  content)
+    response = qianfan.chat(content)
     return response
 
 

@@ -22,6 +22,12 @@ def index(document_path):
     return vector_store
 
 
+# 加载索引
+def load_and_search():
+    """return vector_store"""
+    return FAISS.load_local("faiss_index", embedding)
+
+
 # 查询
 def search(query, document_path):
     """return docs"""
