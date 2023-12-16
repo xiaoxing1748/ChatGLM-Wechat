@@ -5,17 +5,19 @@ import embeddings
 
 
 # 加载embedding
-embedding = embeddings.load()
+# embedding = embeddings.load()
 
 
 # FAISS向量存储
-def index(document_path):
+def index(document_path, embedding=None):
     """return vector_store"""
     # 加载并分割文档
     text = document_loader.load_and_split_unstructured(document_path)
     # 输出分割完的文档
     print(text)
     # 构建向量存储
+    if embedding is None:
+        embedding = embeddings.load()
     vector_store = FAISS.from_documents(text, embedding)
     # 保存索引
     vector_store.save_local("faiss_index")
@@ -23,15 +25,18 @@ def index(document_path):
 
 
 # 加载索引
-def load_and_search():
+def load(embedding=None):
     """return vector_store"""
+    if embedding is None:
+        embedding = embeddings.load()
     return FAISS.load_local("faiss_index", embedding)
 
 
 # 查询
-def search(query, document_path):
+def search(query, document_path, vector_store=None):
     """return docs"""
-    vector_store = index(document_path)
+    if vector_store is None:
+        vector_store = index(document_path)
     # 查询向量
     # docs = vector_store.similarity_search(query)
     # 查询带分数的向量
@@ -42,8 +47,7 @@ def search(query, document_path):
 # 加载索引并搜索
 def load_and_search(query):
     """return docs"""
-    vector_store = FAISS.load_local("faiss_index", embedding)
-    docs = vector_store.similarity_search_with_score(query)
+    docs = load().similarity_search_with_score(query)
     return docs
 
 

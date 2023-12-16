@@ -11,7 +11,7 @@ ChatGLM-Wechat:.
 ├─config.yaml #配置
 ├─requirements.txt #依赖
 ├─Setup.py #项目首次启动安装依赖，然后启动main.py服务
-├─wechatserver.py #服务器连接API
+├─wechat_api.py #服务器连接API
 ├─main.py #主服务
 ├─document #知识库目录
 |   └news.txt #知识库文件

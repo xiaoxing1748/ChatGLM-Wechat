@@ -14,6 +14,7 @@ import qianfan_api as qianfan
 import chatglm_api as chatglm
 import faiss_vector_store as faiss_vector_store
 import knowledge_chain as knowledge_chain
+import embeddings
 
 
 app = Flask(__name__)
@@ -32,63 +33,60 @@ url = config.get_url_path()
 client = WeChatClient(wechat_appid, wechat_appsecret)
 
 
-docs = faiss_vector_store.search("question", "./document/news.txt")
+# 加载embedding
+embedding = embeddings.load()
+# 向量存储
+document_path = "./document/news.txt"
+vector_store = faiss_vector_store.index(document_path, embedding)
+
 
 # 回复缓存
 last_responses = {}
 
 
+# 生成回答
+def getresponse(msg):
+
+    docs = faiss_vector_store.search(msg.content, document_path, vector_store)
+    # 如果传入的消息是 "/获取回答"，且来源在字典中存在时，返回对应来源的最后 response 信息
+    if msg.content == "/获取回答" and msg.source in last_responses:
+        response = last_responses[msg.source]
+
+    # 本地ChatGLM
+    if msg.content == "/a":
+        response = chatglm.chat(msg.content)['response']
+    # 本地QAChain
+    if msg.content == "/b":
+        response = knowledge_chain.qa_chain_legacy(msg.content, vector_store)
+    # 千帆ChatGLM
+    if msg.content == "/c":
+        response = qianfan.chat(msg.content)
+    # 千帆QAChain
+    if msg.content == "/d":
+        response = knowledge_chain.qianfan_chain(msg.content, docs)
+    # 千帆知识库
+    if msg.content == "/e":
+        response = qianfan.chat_with_knowledge_base(msg.content)
+    else:
+        response = "已收到信息"
+
+    return response
+
+
 # 已认证公众号的异步回复
-def asyncTask(source, content):
-    print("提问:source:{}, content:{}".format(source, content))
+def asyncTask(msg):
+    print("提问:source:{}, content:{}".format(msg.source, msg.content))
+    # response = getresponse(msg)
     response = "已收到信息"
-
-    # 调用本地LangChain
-    # response = chatTest.chat(content)
-
-    # 调用千帆ChatGLM
-    # response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
-
-    # 调用千帆知识库
-    # response = qianfan.chat_with_knowledge_base(
-    # qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
-
-    # 调用本地ChatGLM
-    # response = chatglm.chat(content)['response']
-
     print("回答:reply:{}".format(response))
-    client.message.send_text(source, response)
+    client.message.send_text(msg.source, response)
 
 
 # 未认证公众号的同步回复，响应限时5秒
 def reply_msg(msg):
-    global last_responses  # 引用全局变量
-
     print("提问:source:{}, content:{}".format(
         msg.source, msg.content))
-
-    # 如果传入的消息是 "/获取回答"，且来源在字典中存在时，返回对应来源的最后 response 信息
-    if msg.content == "/获取回答" and msg.source in last_responses:
-        response = last_responses[msg.source]
-    else:
-
-        response = "已收到信息"
-
-        # 调用本地LangChain
-        # response = chatTest.chat(content)
-
-        # 调用千帆ChatGLM
-        # response = qianfan.chat(qianfan_apikey, qianfan_secretkey, content)
-
-        # 调用千帆知识库
-        # response = qianfan.chat_with_knowledge_base(
-        # qianfan_apikey, qianfan_secretkey, qianfan_serviceid, content)
-
-        # 调用本地ChatGLM
-        # response = chatglm.chat(content)['response']
-
-        last_responses[msg.source] = response  # 存储最后接收到的 response 信息
-
+    response = getresponse(msg)
     print("回答:reply:{}".format(response))
     # reply=create_reply(response, msg)
     reply = TextReply(content=response, message=msg)
@@ -121,7 +119,7 @@ def wechat():
                 # print("message from wechat msg:{}".format(msg))
 
                 # 异步回复
-                t1 = Thread(target=asyncTask, args=(msg.source, msg.content))
+                t1 = Thread(target=asyncTask, args=(msg))
                 t1.start()
                 return "success"
 
@@ -138,9 +136,9 @@ def wechat():
 
 if __name__ == '__main__':
     print('正在启动公众号后台')
-    # app.run(host='127.0.0.1', port=9000, debug=True)
+    app.run(host='127.0.0.1', port=9000, debug=True)
     # docs = faiss_vector_store.search("question", "./document/news.txt")
     # print(knowledge_chain.qianfan_chain("什么啤酒好喝？", docs))
     # print(qianfan.chat_with_knowledge_base("你好"))
-    print(qianfan.chat("你好"))
+    # print(qianfan.chat("你好"))
     # print(qianfan.get_access_token())
