@@ -3,7 +3,7 @@ import pprint
 from langchain.document_loaders import UnstructuredFileLoader
 from langchain.document_loaders import JSONLoader
 import os
-from text_splitter.chinese_text_splitter import ChineseTextSplitter
+from text_splitter import ChineseTextSplitter
 
 
 # 通用加载器

@@ -8,9 +8,9 @@ import platform
 def create_venv():
     print("Creating virtual environment...")
     if platform.system() == "Windows":
-        subprocess.run(["python", "-m", "venv", "venv"], check=True)
+        subprocess.run(["python", "-m", "venv", ".venv"], check=True)
     else:
-        subprocess.run(["python3", "-m", "venv", "venv"], check=True)
+        subprocess.run(["python3", "-m", "venv", ".venv"], check=True)
 
 
 def initialize_config():
@@ -54,16 +54,16 @@ def start():
 
 
 if __name__ == "__main__":
-    # venv_path = "venv"
+    venv_path = "venv"
 
-    # if not os.path.exists(venv_path):
-    #     create_venv()
+    if not os.path.exists(venv_path):
+        create_venv()
 
     # Change to the script's directory
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-    initialize_config()
+    # initialize_config()
 
-    start()
+    # start()
 
     # start_venv()

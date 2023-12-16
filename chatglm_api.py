@@ -58,8 +58,7 @@ def run_llm(LLM_PATH=None):
     if LLM_PATH is None:
         LLM_PATH = r"F:\ChatGLM\model"
     global model, tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
-        LLM_PATH, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(LLM_PATH, trust_remote_code=True)
     model = AutoModel.from_pretrained(
         LLM_PATH, trust_remote_code=True).cuda()
     # 多显卡支持，使用下面三行代替上面两行，将num_gpus改为你实际的显卡数量

@@ -1,13 +1,13 @@
-transformers>=4.30.2
-# gradio
-faiss-cpu
-langchain
+torch --index-url https://download.pytorch.org/whl/cu117
+transformers==4.30.2
+pip install cpm_kernels
 sentence_transformers
-nltk
-# beautifulsoup4
-# 注：使用wechatpya26
-wechatpy
+faiss-cpu
+langchain>=0.0.350
+unstructured
+#wechatpyalpha26
+https://github.com/wechatpy/wechatpy/archive/master.zip
 flask
-# torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
-# winget install jqlang.jq
-# jq
+fastapi
+uvicorn
+qianfan

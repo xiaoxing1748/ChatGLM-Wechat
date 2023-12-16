@@ -10,6 +10,7 @@ embedding = embeddings.load()
 
 # FAISS向量存储
 def index(document_path):
+    """return vector_store"""
     # 加载并分割文档
     text = document_loader.load_and_split_unstructured(document_path)
     # 输出分割完的文档
@@ -23,6 +24,7 @@ def index(document_path):
 
 # 查询
 def search(query, document_path):
+    """return docs"""
     vector_store = index(document_path)
     # 查询向量
     # docs = vector_store.similarity_search(query)
@@ -33,19 +35,23 @@ def search(query, document_path):
 
 # 加载索引并搜索
 def load_and_search(query):
+    """return docs"""
     vector_store = FAISS.load_local("faiss_index", embedding)
     docs = vector_store.similarity_search_with_score(query)
     return docs
 
 
 if __name__ == '__main__':
-    docs = search("摘要", "./document/news.txt")
+    # print(index("./document/news.txt").as_retriever())
+    docs = ""
+    # docs = search("摘要", "./document/news.txt")
     # docs = load_and_search("星期四")
-    for doc in docs:
-        print(doc)
-    print("--------------------")
-    context = []
-    # 遍历docs中的每个元素，提取page_content并添加到context
-    for doc in docs:
-        context.append(doc[0].page_content)
-    print(context)
+    if docs:
+        for doc in docs:
+            print(doc)
+        print("--------------------")
+        context = []
+        # 遍历docs中的每个元素，提取page_content并添加到context
+        for doc in docs:
+            context.append(doc[0].page_content)
+        print(context)

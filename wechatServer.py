@@ -5,13 +5,15 @@ from flask import request
 from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException, InvalidAppIdException
 from wechatpy import parse_message
-from wechatpy.replies import create_reply
+# from wechatpy.replies import create_reply
 from wechatpy.replies import TextReply
 from wechatpy import WeChatClient
 from threading import Thread
-from service.config_loader import ConfigLoader
-import service.api.qianfan_api as qianfan
-import service.api.chatglm_api as chatglm
+from config_loader import ConfigLoader as config
+import qianfan_api as qianfan
+import chatglm_api as chatglm
+import faiss_vector_store as faiss_vector_store
+import knowledge_chain as knowledge_chain
 
 
 app = Flask(__name__)
@@ -22,7 +24,6 @@ app.logger.addHandler(handler)
 
 
 # 公众号信息
-config = ConfigLoader()
 wechat_appid = config.get_wechat_config("appid")
 wechat_appsecret = config.get_wechat_config("appsecret")
 wechat_token = config.get_wechat_config("token")
@@ -30,10 +31,7 @@ url = config.get_url_path()
 # 公众号客户端配置
 client = WeChatClient(wechat_appid, wechat_appsecret)
 
-# 千帆信息
-qianfan_apikey = config.get_qianfan_config("apikey")
-qianfan_secretkey = config.get_qianfan_config("secretkey")
-qianfan_serviceid = config.get_qianfan_config("serviceid")
+
 
 
 # 已认证公众号的异步回复
@@ -139,4 +137,6 @@ def wechat():
 
 if __name__ == '__main__':
     print('正在启动公众号后台')
-    app.run(host='127.0.0.1', port=9000, debug=True)
+    # app.run(host='127.0.0.1', port=9000, debug=True)
+    docs = faiss_vector_store.search("question", "./document/news.txt")
+    print(knowledge_chain.llm_chain(docs)

@@ -3,6 +3,13 @@ import requests
 import json
 import os
 import qianfan
+from config_loader import ConfigLoader as config
+
+
+# 千帆信息
+qianfan_apikey = config.get_qianfan_config("apikey")
+qianfan_secretkey = config.get_qianfan_config("secretkey")
+qianfan_serviceid = config.get_qianfan_config("serviceid")
 
 
 # 获取access_token
@@ -98,8 +105,8 @@ def qianfan_chat(accesskey, secretkey, content, appid=None, model=None):
     chat_comp = qianfan.ChatCompletion()
 
     # 指定特定模型
-    resp = chat_comp.do(model="ChatGLM2-6B-32K", messages=[{
+    response = chat_comp.do(model="ChatGLM2-6B-32K", messages=[{
         "role": "user",
         "content": content
     }])
-    return resp
+    return response
