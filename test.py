@@ -1,21 +1,74 @@
-# import faiss_vector_store
-# import knowledge_chain
-# vector_store = faiss_vector_store.index("./document/test.txt")
-# question = "总结一下已知信息"
-# print(knowledge_chain.llm_chain("你好"))
-# print(knowledge_chain.qa_chain_legacy(
-# "你好", faiss_vector_store.index("./document/test.txt")))
 import json
 
-# JSON字符串
-json_string = '{"id":"as-h6imfd0j38","object":"chat.completion","created":1702764497,"result":"我推荐尝试哈尔滨啤酒，这是一种口感清爽、带有麦芽香气的好啤酒。当然，每个人的口味偏好不同，你可以尝试不同的啤酒，找到自己喜欢的口感。","is_truncated":false,"need_clear_history":false,"usage":{"prompt_tokens":189,"completion_tokens":33,"total_tokens":222}}'
 
-# 解析JSON字符串
-data = json.loads(json_string)
+def save_responses(msg, response_dict, max_entries=3):
+    # 将新的键值对添加到字典中
+    response_dict[msg.source] = msg.content
 
-# 提取"result"字段的值
-result_value = data["result"]
+    # 如果字典中的键值对数量超过了最大限制，删除最早的键值对
+    if len(response_dict) > max_entries:
+        # 获取字典的所有键并按照插入顺序排序
+        sorted_keys = list(response_dict.keys())
 
-# 打印"result"字段的值
-# print(result_value)
-print(json.loads(json_string)["result"])
+        # 删除最早的键值对
+        del response_dict[sorted_keys[0]]
+
+
+class Message:
+    def __init__(self, source, content):
+        self.source = source
+        self.content = content
+
+
+# 创建一个空的字典来存储响应
+response_dict = {}
+
+# 添加一些测试消息
+messages = [
+    Message("1", "Hello, how are you?"),
+    Message("2", "I'm doing well, thanks!"),
+    Message("3", "That's great to hear."),
+    Message("4", "Hi there!"),
+    Message("5", "Hello!"),
+    Message("6", "What's up?"),
+    Message("7", "Not much, just testing."),
+    Message("8", "Seems to be working fine."),
+    Message("9", "Good to know!"),
+    Message("10", "Thanks!"),
+    Message("1", "Hello, how are you?"),
+    Message("2", "I'm doing well, thanks!"),
+    Message("3", "That's great to hear."),
+    Message("4", "Hi there!"),
+    Message("5", "Hello!"),
+    Message("6", "What's up?"),
+    Message("7", "Not much, just testing."),
+    Message("8", "Seems to be working fine."),
+    Message("9", "Good to know!"),
+    Message("10", "Thanks!"),
+]
+
+# 逐个添加消息并测试函数
+for msg in messages:
+    save_responses(msg, response_dict, max_entries=3)
+    print("Response Dictionary:")
+    for key, value in response_dict.items():
+        print(f"{key}: {value}")
+    print("--------------------------")
+
+# 打印最终的响应字典
+print("Final Response Dictionary:")
+for key, value in response_dict.items():
+    print(f"{key}: {value}")
+
+    json1 = [{
+        "id": "as-bcmt5ct4iy",
+        "object": "chat.completion",
+        "created": 1702232479,
+        "result": "你好！",
+        "usage": {
+            "prompt_tokens": 2,
+            "completion_tokens": 5,
+            "total_tokens": 3
+        }
+    }]
+print(json.loads(json1)["result"])

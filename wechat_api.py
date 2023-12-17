@@ -15,11 +15,11 @@ import chatglm_api as chatglm
 import faiss_vector_store as faiss_vector_store
 import knowledge_chain as knowledge_chain
 import embeddings
+import json
 
 
-app = Flask(__name__)
-app.debug = True
 print("启动于:", datetime.datetime.now())
+app = Flask(__name__)
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
 
@@ -37,60 +37,94 @@ client = WeChatClient(wechat_appid, wechat_appsecret)
 embedding = embeddings.load()
 # 向量存储
 document_path = "./document/news.txt"
+vector_store = ""
 vector_store = faiss_vector_store.index(document_path, embedding)
 
 
 # 回复缓存
-last_responses = {}
+response_dict = {}
+
+
+def save_responses(msg, response, response_dict, max_entries=10):
+    # 将新的键值对添加到字典中
+    response_dict[msg.source] = response
+
+    # 如果字典中的键值对数量超过了最大限制，删除最早的键值对
+    if len(response_dict) > max_entries:
+        # 获取字典的所有键并按照插入顺序排序
+        sorted_keys = list(response_dict.keys())
+
+        # 删除最早的键值对
+        del response_dict[sorted_keys[0]]
 
 
 # 生成回答
 def getresponse(msg):
-
     docs = faiss_vector_store.search(msg.content, document_path, vector_store)
-    # 如果传入的消息是 "/获取回答"，且来源在字典中存在时，返回对应来源的最后 response 信息
-    if msg.content == "/获取回答" and msg.source in last_responses:
-        response = last_responses[msg.source]
-
     # 本地ChatGLM
-    if msg.content == "/a":
-        response = chatglm.chat(msg.content)['response']
+    if msg.content.startswith("/a "):
+        question = msg.content.split("/a ")[1]
+        response = chatglm.chat(question)['response']
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
     # 本地QAChain
-    if msg.content == "/b":
-        response = knowledge_chain.qa_chain_legacy(msg.content, vector_store)
+    if msg.content.startswith("/b "):
+        question = msg.content.split("/b ")[1]
+        response = knowledge_chain.qa_chain_legacy(question, vector_store)
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
     # 千帆ChatGLM
-    if msg.content == "/c":
-        response = qianfan.chat(msg.content)
+    if msg.content.startswith("/c "):
+        question = msg.content.split("/c ")[1]
+        response = qianfan.chat(question).text
+        response = json.loads(response)["result"]
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
     # 千帆QAChain
-    if msg.content == "/d":
-        response = knowledge_chain.qianfan_chain(msg.content, docs)
+    if msg.content.startswith("/d "):
+        question = msg.content.split("/d ")[1]
+        response = knowledge_chain.qianfan_chain(question, docs).text
+        response = json.loads(response)["result"]
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
     # 千帆知识库
-    if msg.content == "/e":
-        response = qianfan.chat_with_knowledge_base(msg.content)
+    if msg.content.startswith("/e "):
+        question = msg.content.split("/e ")[1]
+        response = qianfan.chat_with_knowledge_base(question).text
+        response = json.loads(response)["result"]
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
     else:
         response = "已收到信息"
-
-    return response
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        return response
 
 
 # 已认证公众号的异步回复
-def asyncTask(msg):
-    print("提问:source:{}, content:{}".format(msg.source, msg.content))
-    # response = getresponse(msg)
-    response = "已收到信息"
-    print("回答:reply:{}".format(response))
+def async_reply_msg(msg):
+    print("source:{}\ncontent:{}".format(msg.source, msg.content))
+    response = getresponse(msg)
+    print("response:{}\n".format(response))
     client.message.send_text(msg.source, response)
 
 
-# 未认证公众号的同步回复，响应限时5秒
+# 未认证公众号的响应回复，响应限时5秒
 def reply_msg(msg):
-    print("提问:source:{}, content:{}".format(
-        msg.source, msg.content))
-    response = getresponse(msg)
-    print("回答:reply:{}".format(response))
-    # reply=create_reply(response, msg)
-    reply = TextReply(content=response, message=msg)
-    return reply.render()
+    # response = getresponse(msg)
+    # 备注：响应回答超时会重试三次，因此响应回答只能用来做获取回答功能，不能用来做聊天功能
+    if msg.content == "/获取回答" and msg.source in response_dict:
+        response = f"您最近一次提问的回答是：{response_dict[msg.source]}"
+        print("回答:reply:{}".format(response))
+        reply = TextReply(content=response, message=msg)
+        return reply.render()
+    else:
+        return None
 
 
 @app.route(url, methods=['GET', 'POST'])
@@ -119,13 +153,14 @@ def wechat():
                 # print("message from wechat msg:{}".format(msg))
 
                 # 异步回复
-                t1 = Thread(target=asyncTask, args=(msg))
+                t1 = Thread(target=async_reply_msg, args=(msg,))
                 t1.start()
-                return "success"
 
                 # 同步回复
-                # response = reply_msg(msg)
-                # return response
+                response = reply_msg(msg)
+                if response is not None:
+                    return response
+                return "success"
 
             except (InvalidAppIdException, InvalidSignatureException):
                 print("cannot decrypt message!")
@@ -136,7 +171,7 @@ def wechat():
 
 if __name__ == '__main__':
     print('正在启动公众号后台')
-    app.run(host='127.0.0.1', port=9000, debug=True)
+    app.run(host='127.0.0.1', port=9000, debug=False)
     # docs = faiss_vector_store.search("question", "./document/news.txt")
     # print(knowledge_chain.qianfan_chain("什么啤酒好喝？", docs))
     # print(qianfan.chat_with_knowledge_base("你好"))

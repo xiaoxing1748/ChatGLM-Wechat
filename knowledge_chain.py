@@ -12,10 +12,9 @@ from langchain.chains import RetrievalQA
 from llm import chatglm
 import qianfan_api as qianfan
 
-template = """基于以下【已知内容】的问答对，回答用户提出的【问题】，并遵循如下规则：
-    1、每个问答对的问题以ask:开头，而回答以answer:开头。
-    2、你的回答不应该以“根据已知内容”开头，请直接进行回答。
-    3、如果无法从中得到答案，请说 "抱歉，我无法回答该问题"，此外不允许在答案中添加编造成分。
+template = """基于以下【已知内容】，简短且专业地回答用户提出的【问题】，并遵循如下规则：
+    1、【已知内容】中每个问答对以ask:开头，而回答以answer:开头。
+    2、你的回答不应该以“根据已知内容”开头，请直接进行回答，不允许在答案中添加编造成分。
 
     【已知内容】:
     {context}
