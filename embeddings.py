@@ -1,6 +1,6 @@
 # https://python.langchain.com/docs/integrations/text_embedding
-from langchain.embeddings import HuggingFaceBgeEmbeddings
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from config_loader import ConfigLoader
 
 

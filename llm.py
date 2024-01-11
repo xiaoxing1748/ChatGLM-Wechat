@@ -1,5 +1,5 @@
 # https://python.langchain.com/docs/integrations/llms/chatglm
-from langchain.llms import ChatGLM
+from langchain_community.llms import ChatGLM
 
 
 def chatglm(endpoint_url=None):

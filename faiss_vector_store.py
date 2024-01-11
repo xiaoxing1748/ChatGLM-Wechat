@@ -1,6 +1,6 @@
 # https://python.langchain.com/docs/integrations/vectorstores/faiss
 import document_loader
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 import embeddings
 
 

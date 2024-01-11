@@ -108,13 +108,13 @@ def qa_chain(question, docs):
 def qianfan_chain(question, docs):
 
     # def qianfan_chain(accesskey, secretkey, content, model=None):
-    # langchain框架的千帆模板坏了:qianfan.errors.AccessTokenExpiredError
-    # os.environ["QIANFAN_AK"] = accesskey
-    # os.environ["QIANFAN_SK"] = secretkey
-    # chat = QianfanChatEndpoint(
-    #     model=model,
-    # )
-    # response = chat([HumanMessage(content=content)])
+    #     # langchain框架的千帆模板坏了:qianfan.errors.AccessTokenExpiredError
+    #     os.environ["QIANFAN_AK"] = accesskey
+    #     os.environ["QIANFAN_SK"] = secretkey
+    #     chat = QianfanChatEndpoint(
+    #         model=model,
+    #     )
+    #     response = chat([HumanMessage(content=content)])
 
     # 曲线救国一下:
     context = []

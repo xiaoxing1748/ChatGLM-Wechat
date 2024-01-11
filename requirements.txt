@@ -3,7 +3,7 @@ transformers==4.30.2
 pip install cpm_kernels
 sentence_transformers
 faiss-cpu
-langchain>=0.0.350
+langchain>=0.1.0
 unstructured
 #wechatpyalpha26
 https://github.com/wechatpy/wechatpy/archive/master.zip

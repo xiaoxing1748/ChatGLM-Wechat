@@ -1,7 +1,7 @@
 # https://python.langchain.com/docs/modules/data_connection/document_loaders
 import pprint
-from langchain.document_loaders import UnstructuredFileLoader
-from langchain.document_loaders import JSONLoader
+from langchain_community.document_loaders import UnstructuredFileLoader
+from langchain_community.document_loaders import JSONLoader
 import os
 from text_splitter import ChineseTextSplitter
 
