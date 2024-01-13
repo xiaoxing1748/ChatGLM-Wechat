@@ -63,7 +63,8 @@ def save_responses(msg, response, response_dict, max_entries=10):
 # 文档路径
 document_path = "./document/news.txt"
 # 向量存储
-vector_store = get_vector_store()
+vector_store = ""
+# vector_store = get_vector_store()
 # 回复缓存
 response_dict = {}
 # 等待队列

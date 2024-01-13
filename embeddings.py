@@ -20,8 +20,10 @@ def load(model_name=None):
             model_name=model_name,
             model_kwargs=model_kwargs,
             encode_kwargs=encode_kwargs,
+            query_instruction="为这个句子生成表示以用于检索相关文章："
         )
     else:
+        print("非BGE模型 使用通用方式")
         model = HuggingFaceEmbeddings(
             model_name=model_name,
             model_kwargs=model_kwargs,

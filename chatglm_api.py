@@ -5,7 +5,7 @@ import json
 import datetime
 import torch
 import requests
-
+from config_loader import ConfigLoader as config
 DEVICE = "cuda"
 DEVICE_ID = "0"
 CUDA_DEVICE = f"{DEVICE}:{DEVICE_ID}" if DEVICE_ID else DEVICE
@@ -56,7 +56,7 @@ async def create_item(request: Request):
 # 启用llm服务
 def run_llm(LLM_PATH=None):
     if LLM_PATH is None:
-        LLM_PATH = r"F:\ChatGLM\model"
+        LLM_PATH = config().get_llm_config("llm_path")
     global model, tokenizer
     tokenizer = AutoTokenizer.from_pretrained(LLM_PATH, trust_remote_code=True)
     model = AutoModel.from_pretrained(
@@ -97,4 +97,5 @@ def chat(prompt, history=None, max_length=None, top_p=None, temperature=None):
 
 
 if __name__ == '__main__':
-    run_llm()
+    LLM_PATH = config().get_llm_config("llm_path")
+    run_llm(LLM_PATH)
