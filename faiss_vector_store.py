@@ -4,23 +4,22 @@ from langchain_community.vectorstores import FAISS
 import embeddings
 
 
-# 加载embedding
-# embedding = embeddings.load()
-
-
 # FAISS向量存储
-def index(document_path, embedding=None):
+def index(document_path, embedding=None, log=None):
     """return vector_store"""
     # 加载文档
     text = document_loader.load(document_path)
     # 输出分割完的文档
-    print(text)
+    if log is not None:
+        print(text)
+    print("文档加载完成")
     # 构建向量存储
     if embedding is None:
         embedding = embeddings.load()
     vector_store = FAISS.from_documents(text, embedding)
     # 保存索引
     vector_store.save_local("faiss_index")
+    print("索引完成")
     return vector_store
 
 
@@ -41,6 +40,7 @@ def search(query, document_path, vector_store=None):
     # docs = vector_store.similarity_search(query)
     # 查询带分数的向量
     docs = vector_store.similarity_search_with_score(query)
+    print("检索完成")
     return docs
 
 
@@ -49,19 +49,3 @@ def load_and_search(query):
     """return docs"""
     docs = load().similarity_search_with_score(query)
     return docs
-
-
-if __name__ == '__main__':
-    # print(index("./document/news.txt").as_retriever())
-    docs = ""
-    # docs = search("摘要", "./document/news.txt")
-    # docs = load_and_search("星期四")
-    if docs:
-        for doc in docs:
-            print(doc)
-        print("--------------------")
-        context = []
-        # 遍历docs中的每个元素，提取page_content并添加到context
-        for doc in docs:
-            context.append(doc[0].page_content)
-        print(context)
