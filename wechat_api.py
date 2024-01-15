@@ -74,69 +74,57 @@ waiting_for_response = {}
 
 # 生成回答
 def getresponse(msg):
-    if msg.source in waiting_for_response:
-        return "正在生成上一次的回答，请稍后再试"
+    waiting_for_response[msg.source] = True
+    print("等待队列:{}".format(waiting_for_response))
+    # 本地ChatGLM
+    if msg.content.startswith("/a "):
+        question = msg.content.split("/a ")[1]
+        response = knowledge_chain.llm_chain(question)
+        return response
+    # 本地QAChain
+    if msg.content.startswith("/b "):
+        question = msg.content.split("/b ")[1]
+        response = knowledge_chain.qa_chain(question, vector_store)
+        return response
+    # 千帆ChatGLM
+    if msg.content.startswith("/c "):
+        question = msg.content.split("/c ")[1]
+        response = knowledge_chain.qianfan_chain(
+            qfapikey, qfsecretkey, question)
+        return response
+    # 千帆QAChain
+    if msg.content.startswith("/d "):
+        question = msg.content.split("/d ")[1]
+        response = knowledge_chain.qianfan_qa_chain(
+            qfapikey, qfsecretkey, question, vector_store)
+        return response
+    # 千帆知识库
+    if msg.content.startswith("/e "):
+        question = msg.content.split("/e ")[1]
+        response = qianfan.chat_with_knowledge_base(question).text
+        response = json.loads(response)["result"]
+        return response
+    # 测试
+    if msg.content.startswith("/test"):
+        time.sleep(20)
+        response = "这是测试内容"
+        return response
     else:
-        waiting_for_response[msg.source] = True
-        print("等待队列:{}".format(waiting_for_response))
-        # 本地ChatGLM
-        if msg.content.startswith("/a "):
-            question = msg.content.split("/a ")[1]
-            response = knowledge_chain.llm_chain(question)
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        # 本地QAChain
-        if msg.content.startswith("/b "):
-            question = msg.content.split("/b ")[1]
-            response = knowledge_chain.qa_chain(question, vector_store)
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        # 千帆ChatGLM
-        if msg.content.startswith("/c "):
-            question = msg.content.split("/c ")[1]
-            response = knowledge_chain.qianfan_chain(
-                qfapikey, qfsecretkey, question)
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        # 千帆QAChain
-        if msg.content.startswith("/d "):
-            question = msg.content.split("/d ")[1]
-            response = knowledge_chain.qianfan_qa_chain(
-                qfapikey, qfsecretkey, question, vector_store)
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        # 千帆知识库
-        if msg.content.startswith("/e "):
-            question = msg.content.split("/e ")[1]
-            response = qianfan.chat_with_knowledge_base(question).text
-            response = json.loads(response)["result"]
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        # 测试
-        if msg.content.startswith("/test "):
-            time.sleep(10)
-            response = "这是测试内容"
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
-        else:
-            response = "正在排队中，请稍后发送“/获取回答”"
-            save_responses(msg, response, response_dict)
-            print(response_dict)
-            return response
+        response = "正在排队中，请稍后发送“/获取回答”"
+        return response
 
 
 # 已认证公众号的异步回复
 def async_reply_msg(msg):
     print("source:{}\ncontent:{}".format(msg.source, msg.content))
-    response = getresponse(msg)
-    print("response:{}\n".format(response))
-    client.message.send_text(msg.source, response)
+    if msg.source in waiting_for_response:
+        client.message.send_text(msg.source, "正在生成上一次的回答，请稍后再试")
+    else:
+        response = getresponse(msg)
+        print("response:{}\n".format(response))
+        save_responses(msg, response, response_dict)
+        print(response_dict)
+        client.message.send_text(msg.source, response)
 
 
 # 未认证公众号的响应回复，响应限时5秒
