@@ -5,6 +5,9 @@ config.yaml
 /knowledge_base/*
 faiss_index
 prompt.txt
+input.csv
+output.csv
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
