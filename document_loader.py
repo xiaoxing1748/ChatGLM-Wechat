@@ -2,6 +2,7 @@
 import pprint
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_community.document_loaders import JSONLoader
+from langchain_community.document_loaders.csv_loader import CSVLoader
 import os
 from text_splitter import ChineseTextSplitter
 
@@ -12,6 +13,8 @@ def load(filepath):
     _, ext = os.path.splitext(filepath)
     if ext in ['.json', '.jsonl']:
         return load_json(filepath)
+    if ext in ['.csv']:
+        return load_csv(filepath)
     else:
         return load_and_split_unstructured(filepath)
 
@@ -27,7 +30,25 @@ def load_json(filepath):
         jq_schema='.messages[].content',
         text_content=False)
     data = loader.load()
-    pprint(data)
+    # pprint(data)
+    return data
+
+
+# csv加载器
+# https://python.langchain.com/docs/integrations/document_loaders/csv
+def load_csv(filepath):
+    """return docs\n
+    CSV文档分割器"""
+    loader = CSVLoader(
+        file_path=filepath,
+        csv_args={
+            "delimiter": ",",
+            "quotechar": '"',
+            "fieldnames": ["ask", "answer"],
+        },
+    )
+    data = loader.load()
+    # print(data)
     return data
 
 
@@ -59,5 +80,6 @@ def load_and_split_unstructured(filepath):
 
 
 if __name__ == '__main__':
-    docs = load("./document/news.txt")
+    # docs = load("./document/news.txt")
+    docs = load("./knowledge_base/a.csv")
     print(docs)

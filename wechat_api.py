@@ -182,7 +182,7 @@ def wechat():
                 t1 = Thread(target=async_reply_msg, args=(msg,))
                 t1.start()
 
-                # 同步回复
+                # 响应回复
                 response = reply_msg(msg)
                 if response is not None:
                     return response

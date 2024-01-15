@@ -11,8 +11,8 @@ import embeddings
 # FAISS向量存储
 def index(document_path, embedding=None):
     """return vector_store"""
-    # 加载并分割文档
-    text = document_loader.load_and_split_unstructured(document_path)
+    # 加载文档
+    text = document_loader.load(document_path)
     # 输出分割完的文档
     print(text)
     # 构建向量存储
