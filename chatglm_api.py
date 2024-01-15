@@ -97,5 +97,5 @@ def chat(prompt, history=None, max_length=None, top_p=None, temperature=None):
 
 
 if __name__ == '__main__':
-    LLM_PATH = config().get_llm_config("llm_path")
+    LLM_PATH = config().get_llm_path()
     run_llm(LLM_PATH)

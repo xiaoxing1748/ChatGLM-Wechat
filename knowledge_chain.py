@@ -3,7 +3,7 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
-# from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 # from langchain.chat_models import QianfanChatEndpoint
 # from langchain_core.language_models.chat_models import HumanMessage
 import os
@@ -12,18 +12,9 @@ from langchain.chains import RetrievalQA
 from llm import chatglm
 import qianfan_api as qianfan
 
-template = """基于以下【已知内容】，简短且专业地回答用户提出的【问题】，并遵循如下规则：
-    1、【已知内容】中每个问答对以ask:开头，而回答以answer:开头。
-    2、你的回答不应该以“根据已知内容”开头，请直接进行回答，不允许在答案中添加编造成分。
-
-    【已知内容】:
-    {context}
-    
-    【问题】:
-    {question}
-    
-    【回答】:
-    """
+# 加载prompt
+with open("./prompt.txt", 'r', encoding='utf-8') as file:
+    template = file.read()
 
 
 # Legacy LLM chain 这是示例，优先用qa_chain_legacy()
@@ -54,11 +45,11 @@ def qa_chain_legacy(question, vector_store):
 
 
 # LCEL chain
-def llm_chain(question):
-    prompt = PromptTemplate.from_template("{question}")
+def llm_chain(question, vector_store):
+    prompt = PromptTemplate.from_template(template)
     model = chatglm()
     chain = (
-        {"context": RunnablePassthrough(), "question": RunnablePassthrough()}
+        {"context": vector_store.as_retriever(), "question": RunnablePassthrough()}
         | prompt
         | model
         | StrOutputParser())

@@ -6,8 +6,8 @@ from config_loader import ConfigLoader
 
 # 加载embedding
 def load(model_name=None):
-    # model_kwargs = {'device': 'cpu'}
-    model_kwargs = {'device': 'cuda'}
+    model_kwargs = {'device': 'cpu'}
+    # model_kwargs = {'device': 'cuda'}
     encode_kwargs = {'normalize_embeddings': True}
 
     if model_name is None:

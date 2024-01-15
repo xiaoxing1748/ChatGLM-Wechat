@@ -1,13 +1,10 @@
 #自定义
-/model/*.bin
-/model/*.model
-/model/*.json
+/models/*
 /backup
 config.yaml
 /knowledge_base/*
-Todo
-test.py
 faiss_index
+prompt.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -44,7 +44,7 @@ def load_csv(filepath):
         csv_args={
             "delimiter": ",",
             "quotechar": '"',
-            "fieldnames": ["ask", "answer"],
+            "fieldnames": ["- ask", "answer"],
         },
     )
     data = loader.load()

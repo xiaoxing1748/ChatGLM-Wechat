@@ -23,7 +23,11 @@ def get_docs(question):
 
 
 # 文档路径
-document_path = "./knowledge_base/a.csv"
+document_path = "./knowledge_base/本地知识库.csv"
 # 向量存储
 vector_store = get_vector_store()
-print(get_docs("哪些人能报考"))
+question = "学校地址是什么？"
+# print(get_docs(question))
+# response = knowledge_chain.qa_chain_legacy(question, vector_store)
+response = knowledge_chain.llm_chain(question, vector_store)
+print(response)
