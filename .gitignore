@@ -7,7 +7,7 @@ faiss_index
 prompt.txt
 input.csv
 output.csv
-
+analysis.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
