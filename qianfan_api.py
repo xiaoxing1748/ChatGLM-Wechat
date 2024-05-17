@@ -142,4 +142,7 @@ def qianfan_chat(accesskey, secretkey, content, appid=None, model=None):
 
 
 if __name__ == "__main__":
-    print(chat("你好"))
+    question = "你好"
+    response = qianfan.chat_with_knowledge_base(question)
+    response = json.loads(response).get("result")
+    print(response)

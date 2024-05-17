@@ -88,14 +88,15 @@ def process_data():
 # 检索参考回答并评估
 def analysis_data():
     vector_store = get_vector_store1(answer_sets)
-    with open('output.csv', mode='r', encoding='gb2312') as infile, open('analysis.csv', mode='w', encoding='gb2312', newline='') as outfile:
+    with open('output.csv', mode='r', encoding='utf-8') as infile, open('analysis.csv', mode='w', encoding='utf-8', newline='') as outfile:
         csv_reader = csv.reader(infile)
         csv_writer = csv.writer(outfile)
         for row in csv_reader:
             if row:  # 检查行不是空的
                 question = row[0]
                 response = row[1]
-                execution_time_ms_rounded = row[2]
+                # execution_time_ms_rounded = row[2]
+                execution_time_ms_rounded = row[3]
                 print(response)
                 answers = get_docs(response, vector_store)
                 # 取前三个最相关的进行手动评估

@@ -82,8 +82,8 @@ def getresponse(msg):
         response = knowledge_chain.llm_chain(question)
         return response
     # 本地QAChain
-    if msg.content.startswith("/b "):
-        question = msg.content.split("/b ")[1]
+    if msg.content.startswith("/本地 "):
+        question = msg.content.split("/本地 ")[1]
         response = knowledge_chain.qa_chain(question, vector_store)
         return response
     # 千帆ChatGLM
@@ -93,20 +93,20 @@ def getresponse(msg):
             qfapikey, qfsecretkey, question)
         return response
     # 千帆QAChain
-    if msg.content.startswith("/d "):
-        question = msg.content.split("/d ")[1]
+    if msg.content.startswith("/云端 "):
+        question = msg.content.split("/云端 ")[1]
         response = knowledge_chain.qianfan_qa_chain(
             qfapikey, qfsecretkey, question, vector_store)
         return response
     # 千帆知识库
-    if msg.content.startswith("/e "):
-        question = msg.content.split("/e ")[1]
+    if msg.content.startswith("/千帆 "):
+        question = msg.content.split("/千帆 ")[1]
         response = qianfan.chat_with_knowledge_base(question).text
-        response = json.loads(response)["result"]
+        response = json.loads(response).get("result")
         return response
     # 测试
     if msg.content.startswith("/test"):
-        time.sleep(20)
+        time.sleep(6)
         response = "这是测试内容"
         return response
     else:

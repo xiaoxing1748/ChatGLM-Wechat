@@ -37,21 +37,21 @@ serviceid = config.get_qianfan_config("serviceid")
 # 文档路径
 document_path = "./knowledge_base/本地知识库.csv"
 # 向量存储
-vector_store = ""
-# vector_store = get_vector_store()
+# vector_store = ""
+vector_store = get_vector_store()
 
 question = "学校地址是什么？"
-question = "你好"
+# question = "你好"
 
 # docs = get_docs(question)
 # print(format_docs(docs))
 # exit()
 
 # response = knowledge_chain.qa_chain_legacy(question, vector_store)
-# response = knowledge_chain.qa_chain(question, vector_store)
+response = knowledge_chain.qa_chain(question, vector_store)
 
-response = knowledge_chain.qianfan_chain(
-    apikey, secretkey, question, vector_store)
+# response = knowledge_chain.qianfan_chain(
+#     apikey, secretkey, question, vector_store)
 # response = knowledge_chain.qianfan_chain(
 #     apikey, secretkey, question)
 
