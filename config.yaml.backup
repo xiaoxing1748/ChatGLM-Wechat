@@ -10,6 +10,9 @@ qianfan_config:
   apikey: myapikey
   secretkey: mysecretkey
   serviceid: myserviceid
+  sdkaccesskey: mysdkaccesskey
+  sdksecretkey: mysdksecretkey
+  model: ChatGLM2-6B-32K
 
 llm_path: F:\ChatGLM\model
 # llm_path: THUDM/ChatGLM2-6B-int4

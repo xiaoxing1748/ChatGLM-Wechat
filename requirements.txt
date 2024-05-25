@@ -1,6 +1,10 @@
-torch --index-url https://download.pytorch.org/whl/cu117
+protobuf
+torch
 transformers==4.30.2
-pip install cpm_kernels
+cpm_kernels
+sentencepiece
+accelerate
+sse-starlette
 sentence_transformers
 faiss-cpu
 langchain>=0.1.0
