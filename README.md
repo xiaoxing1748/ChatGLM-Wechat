@@ -1,6 +1,6 @@
 # ChatGLM-Wechat
 
-## 个人毕业设计：基于 ChatGLM 的微信公众号
+## 结合 ChatGLM 的知识库微信公众号
 
 ---
 
